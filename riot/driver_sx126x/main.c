@@ -164,6 +164,17 @@ static int sx126x_get_cmd(netdev_t *netdev, int argc, char **argv)
         netdev->driver->get(netdev, NETOPT_CODING_RATE, &cr, sizeof(uint8_t));
         printf("Coding rate: %d\n", cr);
     }
+    else if (!strcmp("iq", argv[2])) {
+    	netopt_enable_t iq;
+        netdev->driver->get(netdev, NETOPT_IQ_INVERT, &iq, sizeof(netopt_enable_t));
+        printf("IQ: %s\n", iq==0 ? "disable": "enable");
+    }
+    else if (!strcmp("syncword", argv[2])) {
+    	uint8_t syncword;
+        netdev->driver->get(netdev, NETOPT_SYNCWORD, &syncword, sizeof(syncword));
+        printf("Syncword: 0x%02x\n", syncword);
+    }
+
     else if (!strcmp("random", argv[2])) {
         uint32_t rand;
         netdev->driver->get(netdev, NETOPT_RANDOM, &rand, sizeof(uint32_t));
@@ -176,6 +187,50 @@ static int sx126x_get_cmd(netdev_t *netdev, int argc, char **argv)
 
     return 0;
 }
+
+static void _set_opt(netdev_t *netdev, netopt_t opt, bool val, char *str_help)
+{
+    netopt_enable_t en = val ? NETOPT_ENABLE : NETOPT_DISABLE;
+
+    netdev->driver->set(netdev, opt, &en, sizeof(en));
+    printf("Successfully ");
+    if (val) {
+        printf("enabled ");
+    }
+    else {
+        printf("disabled ");
+    }
+    printf("%s\n", str_help);
+}
+
+
+static int sx126x_crc_cmd(netdev_t *netdev, int argc, char **argv)
+{
+    if (argc < 4 || strcmp(argv[2], "set") != 0) {
+        printf("usage: %s set <1|0>\n", argv[1]);
+        return 1;
+    }
+
+    int tmp = atoi(argv[2]);
+
+    _set_opt(netdev, NETOPT_INTEGRITY_CHECK, tmp, "CRC check");
+    return 0;
+}
+
+static int sx126x_implicit_cmd(netdev_t *netdev, int argc, char **argv)
+{
+    if (argc < 4 || strcmp(argv[2], "set") != 0) {
+        printf("usage: %s set <1|0>\n", argv[1]);
+        return 1;
+    }
+
+    int tmp = atoi(argv[2]);
+
+    _set_opt(netdev, NETOPT_FIXED_HEADER, tmp, "implicit header");
+    return 0;
+}
+
+
 
 static void _set_usage(const char *cmd)
 {
@@ -220,6 +275,16 @@ static int sx126x_set_cmd(netdev_t *netdev, int argc, char **argv)
         uint8_t cr = atoi(argv[3]);
         ret = netdev->driver->set(netdev, NETOPT_CODING_RATE, &cr, sizeof(uint8_t));
     }
+    else if (!strcmp("iq", argv[2])) {
+    	netopt_enable_t iq = strcmp("disable",argv[3]) == 0 ? NETOPT_DISABLE : NETOPT_ENABLE;
+        ret = netdev->driver->set(netdev, NETOPT_IQ_INVERT, &iq, sizeof(netopt_enable_t));
+    }
+    else if (!strcmp("syncword", argv[2])) {
+        uint8_t syncword = atoi(argv[3]);
+        ret = netdev->driver->set(netdev, NETOPT_SYNCWORD, &syncword, sizeof(syncword));
+        printf("Syncword: 0x%02x\n", syncword);
+    }
+
     else {
         _set_usage(argv[0]);
         return -1;
@@ -231,6 +296,76 @@ static int sx126x_set_cmd(netdev_t *netdev, int argc, char **argv)
     }
 
     printf("%s set\n", argv[2]);
+    return 0;
+}
+
+
+int sx126x_setup_cmd(netdev_t *netdev, int argc, char **argv)
+{
+
+    if (argc < 5) {
+        puts("usage: sx126x setup "
+             "<bandwidth (125, 250, 500)> "
+             "<spreading factor (7..12)> "
+             "<code rate (5..8)>");
+        return -1;
+    }
+
+    /* Check bandwidth value */
+    int bw = atoi(argv[2]);
+    uint8_t lora_bw;
+
+    switch (bw) {
+    case 125:
+        puts("setup: setting 125KHz bandwidth");
+        lora_bw = LORA_BW_125_KHZ;
+        break;
+
+    case 250:
+        puts("setup: setting 250KHz bandwidth");
+        lora_bw = LORA_BW_250_KHZ;
+        break;
+
+    case 500:
+        puts("setup: setting 500KHz bandwidth");
+        lora_bw = LORA_BW_500_KHZ;
+        break;
+
+    default:
+        puts("[Error] setup: invalid bandwidth value given, "
+             "only 125, 250 or 500 allowed.");
+        return -1;
+    }
+
+    /* Check spreading factor value */
+    uint8_t lora_sf = atoi(argv[3]);
+
+    if (lora_sf < 7 || lora_sf > 12) {
+        puts("[Error] setup: invalid spreading factor value given");
+        return -1;
+    }
+
+    /* Check coding rate value */
+    int cr = atoi(argv[4]);
+
+    if (cr < 5 || cr > 8) {
+        puts("[Error ]setup: invalid coding rate value given");
+        return -1;
+    }
+    uint8_t lora_cr = (uint8_t)(cr - 4);
+
+    /* Configure radio device */
+//    netdev_t *netdev = &sx126x.netdev;
+
+    netdev->driver->set(netdev, NETOPT_BANDWIDTH,
+                        &lora_bw, sizeof(lora_bw));
+    netdev->driver->set(netdev, NETOPT_SPREADING_FACTOR,
+                        &lora_sf, sizeof(lora_sf));
+    netdev->driver->set(netdev, NETOPT_CODING_RATE,
+                        &lora_cr, sizeof(lora_cr));
+
+    puts("[Info] setup: configuration set with success");
+
     return 0;
 }
 
@@ -291,7 +426,7 @@ static int sx126x_tx_cmd(netdev_t *netdev, int argc, char **argv)
 int sx126x_cmd(int argc, char **argv)
 {
     if (argc < 2) {
-        printf("Usage: %s <get|set|rx|tx>\n", argv[0]);
+        printf("Usage: %s <get|set|rx|tx|setup>\n", argv[0]);
         return -1;
     }
 
@@ -309,7 +444,15 @@ int sx126x_cmd(int argc, char **argv)
     else if (!strcmp("tx", argv[1])) {
         return sx126x_tx_cmd(netdev, argc, argv);
     }
-
+    else if (!strcmp("setup", argv[1])) {
+        return sx126x_setup_cmd(netdev, argc, argv);
+    }
+    else if (!strcmp("implicit", argv[1])) {
+        return sx126x_implicit_cmd(netdev, argc, argv);
+    }
+    else if (!strcmp("crc", argv[1])) {
+        return sx126x_crc_cmd(netdev, argc, argv);
+    }
     return 0;
 }
 

@@ -1,4 +1,4 @@
-include $(RIOTBASE)/tests/Makefile.tests_common
+include ../Makefile.tests_common
 
 # other values supported are sx1262, sx1268 and llcc68
 LORA_DRIVER ?= sx1261
