@@ -1,0 +1,270 @@
+[
+    {
+        "id": "409deb7dd3d3fb90",
+        "type": "tab",
+        "label": "Test",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "d62b90c4edbe9e36",
+        "type": "serial-port",
+        "serialport": "/dev/tty.usbmodem14203",
+        "serialbaud": "115200",
+        "databits": "8",
+        "parity": "none",
+        "stopbits": "1",
+        "waitfor": "",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": "",
+        "responsetimeout": "10000"
+    },
+    {
+        "id": "9f2e788979db0914",
+        "type": "inject",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 140,
+        "wires": [
+            [
+                "f207d2d1a8597914"
+            ]
+        ]
+    },
+    {
+        "id": "f207d2d1a8597914",
+        "type": "debug",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 430,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "5b894740609fa8f3",
+        "type": "mqtt in",
+        "z": "409deb7dd3d3fb90",
+        "name": "command",
+        "topic": "",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 140,
+        "y": 260,
+        "wires": [
+            [
+                "507fd0091d6ef986"
+            ]
+        ]
+    },
+    {
+        "id": "187441592f1c5eab",
+        "type": "mqtt out",
+        "z": "409deb7dd3d3fb90",
+        "name": "packet",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "",
+        "x": 590,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "507fd0091d6ef986",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 260,
+        "wires": [
+            [
+                "187441592f1c5eab"
+            ]
+        ]
+    },
+    {
+        "id": "1e2ec22caf643391",
+        "type": "status",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "scope": null,
+        "x": 160,
+        "y": 80,
+        "wires": [
+            [
+                "f207d2d1a8597914"
+            ]
+        ]
+    },
+    {
+        "id": "59aba8aa9d6a924d",
+        "type": "serial in",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "serial": "d62b90c4edbe9e36",
+        "x": 190,
+        "y": 360,
+        "wires": [
+            [
+                "3b5858588834c75d"
+            ]
+        ]
+    },
+    {
+        "id": "c5582684601dd8f0",
+        "type": "serial out",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "serial": "d62b90c4edbe9e36",
+        "x": 590,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "3b5858588834c75d",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 360,
+        "wires": [
+            [
+                "d323fd2b5caf2b1b"
+            ]
+        ]
+    },
+    {
+        "id": "67fa1613bbe61cff",
+        "type": "debug",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 550,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "18cdb7333ab0ccdc",
+        "type": "inject",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 440,
+        "wires": [
+            [
+                "ad2b3edd51afb49a"
+            ]
+        ]
+    },
+    {
+        "id": "ad2b3edd51afb49a",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "send help",
+        "func": "msg.payload=\"help\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 440,
+        "wires": [
+            [
+                "67fa1613bbe61cff",
+                "c5582684601dd8f0"
+            ]
+        ]
+    },
+    {
+        "id": "d323fd2b5caf2b1b",
+        "type": "debug",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 360,
+        "wires": []
+    }
+]

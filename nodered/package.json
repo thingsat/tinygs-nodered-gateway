@@ -1,0 +1,15 @@
+{
+  "name": "tinygs-nodered-gateway",
+  "version": "0.1.0",
+  "description": "TinyGS Gateway with NodeRED",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Didier DONSEZ, Aymeric BROCHIER",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "dependencies": {
+    "node-red": "^2.2.2",
+    "node-red-node-serialport": "^1.0.1"
+  }
+}
