@@ -2,8 +2,16 @@
     {
         "id": "409deb7dd3d3fb90",
         "type": "tab",
-        "label": "Test",
+        "label": "Gateway",
         "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5d34e8d22f59825b",
+        "type": "tab",
+        "label": "Test UART",
+        "disabled": true,
         "info": "",
         "env": []
     },
@@ -27,59 +35,41 @@
         "responsetimeout": "10000"
     },
     {
-        "id": "9f2e788979db0914",
-        "type": "inject",
-        "z": "409deb7dd3d3fb90",
+        "id": "90359e02b1939005",
+        "type": "mqtt-broker",
         "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 160,
-        "y": 140,
-        "wires": [
-            [
-                "f207d2d1a8597914"
-            ]
-        ]
-    },
-    {
-        "id": "f207d2d1a8597914",
-        "type": "debug",
-        "z": "409deb7dd3d3fb90",
-        "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 430,
-        "y": 140,
-        "wires": []
+        "broker": "mqtt.tinygs.com",
+        "port": "8883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
     },
     {
         "id": "5b894740609fa8f3",
         "type": "mqtt in",
         "z": "409deb7dd3d3fb90",
-        "name": "command",
-        "topic": "",
+        "name": "global/#",
+        "topic": "tinygs/global/#",
         "qos": "2",
         "datatype": "auto",
-        "broker": "",
+        "broker": "90359e02b1939005",
         "nl": false,
         "rap": true,
         "rh": 0,
@@ -88,7 +78,7 @@
         "y": 260,
         "wires": [
             [
-                "507fd0091d6ef986"
+                "8520d8694cd8e494"
             ]
         ]
     },
@@ -105,43 +95,10 @@
         "userProps": "",
         "correl": "",
         "expiry": "",
-        "broker": "",
-        "x": 590,
-        "y": 260,
+        "broker": "90359e02b1939005",
+        "x": 690,
+        "y": 640,
         "wires": []
-    },
-    {
-        "id": "507fd0091d6ef986",
-        "type": "function",
-        "z": "409deb7dd3d3fb90",
-        "name": "",
-        "func": "\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 360,
-        "y": 260,
-        "wires": [
-            [
-                "187441592f1c5eab"
-            ]
-        ]
-    },
-    {
-        "id": "1e2ec22caf643391",
-        "type": "status",
-        "z": "409deb7dd3d3fb90",
-        "name": "",
-        "scope": null,
-        "x": 160,
-        "y": 80,
-        "wires": [
-            [
-                "f207d2d1a8597914"
-            ]
-        ]
     },
     {
         "id": "59aba8aa9d6a924d",
@@ -150,10 +107,12 @@
         "name": "",
         "serial": "d62b90c4edbe9e36",
         "x": 190,
-        "y": 360,
+        "y": 480,
         "wires": [
             [
-                "3b5858588834c75d"
+                "3b5858588834c75d",
+                "d9ffd2a510bc27bb",
+                "d323fd2b5caf2b1b"
             ]
         ]
     },
@@ -163,8 +122,8 @@
         "z": "409deb7dd3d3fb90",
         "name": "",
         "serial": "d62b90c4edbe9e36",
-        "x": 590,
-        "y": 500,
+        "x": 730,
+        "y": 180,
         "wires": []
     },
     {
@@ -172,17 +131,19 @@
         "type": "function",
         "z": "409deb7dd3d3fb90",
         "name": "",
-        "func": "\nreturn msg;",
+        "func": "var line = msg.payload;\n\nif(line.startsWith(\"Listen mode started\")) {\n    return msg;\n}\n\nreturn undefined;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 420,
-        "y": 360,
+        "x": 140,
+        "y": 640,
         "wires": [
             [
-                "d323fd2b5caf2b1b"
+                "d323fd2b5caf2b1b",
+                "71c9dcad0e5a3f76",
+                "9c7796b7ddbb5066"
             ]
         ]
     },
@@ -198,12 +159,145 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 550,
-        "y": 440,
+        "x": 710,
+        "y": 80,
         "wires": []
     },
     {
-        "id": "18cdb7333ab0ccdc",
+        "id": "d323fd2b5caf2b1b",
+        "type": "debug",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "71c9dcad0e5a3f76",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "sendRx",
+        "func": "// https://github.com/G4lile0/tinyGS/blob/master/tinyGS/src/Mqtt/MQTT_Client.cpp\n\n/*\n  const char* globalTopic PROGMEM = \"tinygs/global/%cmnd%\";\n  const char* cmndTopic PROGMEM = \"tinygs/%user%/%station%/cmnd/%cmnd%\";\n  const char* teleTopic PROGMEM = \"tinygs/%user%/%station%/tele/%cmnd%\";\n  const char* statTopic PROGMEM = \"tinygs/%user%/%station%/stat/%cmnd%\";\n\n  // tele\n  const char* topicWelcome PROGMEM = \"welcome\";\n  const char* topicPing PROGMEM= \"ping\";\n  const char* topicStatus PROGMEM = \"status\";\n  const char* topicRx PROGMEM= \"rx\";\n  const char* topicGet_adv_prm PROGMEM = \"get_adv_prm\";\n*/\n\n\nmsg.topic = \"tinygs/global/rx\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 620,
+        "wires": [
+            [
+                "187441592f1c5eab"
+            ]
+        ]
+    },
+    {
+        "id": "9c7796b7ddbb5066",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "sendStatus",
+        "func": "// https://github.com/G4lile0/tinyGS/blob/master/tinyGS/src/Mqtt/MQTT_Client.cpp\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 660,
+        "wires": [
+            [
+                "187441592f1c5eab"
+            ]
+        ]
+    },
+    {
+        "id": "4b4484fdbf09e375",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "sendWelcome",
+        "func": "// https://github.com/G4lile0/tinyGS/blob/master/tinyGS/src/Mqtt/MQTT_Client.cpp\n\n\nconst USERID = '376415063';\nconst STATIONID = 'LIG_01_Heltech868';\n\n  // Topic\nconst globalTopic = \"tinygs/global/%cmnd%\";\nconst cmndTopic = \"tinygs/%user%/%station%/cmnd/%cmnd%\";\nconst teleTopic = \"tinygs/%user%/%station%/tele/%cmnd%\";\nconst statTopic = \"tinygs/%user%/%station%/stat/%cmnd%\";\n\n  // Tele\nconst topicWelcome  = \"welcome\";\nconst topicPing = \"ping\";\nconst topicStatus  = \"status\";\nconst topicRx = \"rx\";\nconst topicGet_adv_prm  = \"get_adv_prm\";\n\nvar topic = \"tinygs/%user%/%station%/tele/welcome\";\ntopic = topic.replace(\"%user%\", USERID)\n            .replace(\"%station%\", STATIONID)\n            .replace(\"%user%\", topicWelcome);   \n\nmsg.topic = topic;\n\n\n\nvar doc = {\n    tx: 1,\n    board: 0,\n    station_location: [45.19041217847022, 5.766792295578571]\n};\n\n/*\n  doc[\"tx\"] = configManager.getAllowTx();\n  doc[\"test\"] = configManager.getTestMode();\n  doc[\"tele3d\"] = configManager.getTelemetry3rd();\n  doc[\"time\"] = now;\n  doc[\"version\"] = status.version;\n  doc[\"git_version\"] = status.git_version;\n  doc[\"sat\"] = status.modeminfo.satellite;\n  doc[\"autoUpdate\"] = configManager.getAutoUpdate();\n  doc[\"remoteTune\"] = configManager.getRemoteTune();\n  doc[\"ip\"] = WiFi.localIP().toString();\n  if (configManager.getLowPower()) {\n    doc[\"lp\"].set(configManager.getLowPower());\n  }\n  doc[\"modem_conf\"].set(configManager.getModemStartup());\n  doc[\"boardTemplate\"].set(configManager.getBoardTemplate());\n  doc[\"Mem\"] = ESP.getFreeHeap();\n  doc[\"board\"] = configManager.getBoard();\n  doc[\"mac\"] = clientId;\n  doc[\"station_location\"] = [configManager.getLatitude(), configManager.getLongitude()];\n*/\nmsg.payload = doc;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 760,
+        "wires": [
+            [
+                "187441592f1c5eab",
+                "7a5a96b4a1c9b132"
+            ]
+        ]
+    },
+    {
+        "id": "d9ffd2a510bc27bb",
+        "type": "switch",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "Listen mode started",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 700,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "8520d8694cd8e494",
+        "type": "json",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 410,
+        "y": 320,
+        "wires": [
+            [
+                "35b3d76798d6f3a4"
+            ]
+        ]
+    },
+    {
+        "id": "35b3d76798d6f3a4",
+        "type": "debug",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "c44c9c71bfdd8489",
         "type": "inject",
         "z": "409deb7dd3d3fb90",
         "name": "",
@@ -223,36 +317,16 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 160,
-        "y": 440,
+        "x": 140,
+        "y": 760,
         "wires": [
             [
-                "ad2b3edd51afb49a"
+                "4b4484fdbf09e375"
             ]
         ]
     },
     {
-        "id": "ad2b3edd51afb49a",
-        "type": "function",
-        "z": "409deb7dd3d3fb90",
-        "name": "send help",
-        "func": "msg.payload=\"help\";\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 360,
-        "y": 440,
-        "wires": [
-            [
-                "67fa1613bbe61cff",
-                "c5582684601dd8f0"
-            ]
-        ]
-    },
-    {
-        "id": "d323fd2b5caf2b1b",
+        "id": "7a5a96b4a1c9b132",
         "type": "debug",
         "z": "409deb7dd3d3fb90",
         "name": "",
@@ -264,7 +338,673 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 630,
-        "y": 360,
+        "y": 760,
         "wires": []
+    },
+    {
+        "id": "4c670cd3f08dd52d",
+        "type": "mqtt in",
+        "z": "409deb7dd3d3fb90",
+        "name": "cmnd/#",
+        "topic": "tinygs/376415063/LIG_01_Heltech868/cmnd/#",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "90359e02b1939005",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 320,
+        "wires": [
+            [
+                "8520d8694cd8e494"
+            ]
+        ]
+    },
+    {
+        "id": "1e2319a5a1452bb5",
+        "type": "mqtt in",
+        "z": "409deb7dd3d3fb90",
+        "name": "stat/#",
+        "topic": "tinygs/376415063/LIG_01_Heltech868/stat/#",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "90359e02b1939005",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 360,
+        "wires": [
+            [
+                "8520d8694cd8e494"
+            ]
+        ]
+    },
+    {
+        "id": "966e6425e7eb7ecd",
+        "type": "inject",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 80,
+        "wires": [
+            [
+                "8debdb45d6dcb51a"
+            ]
+        ]
+    },
+    {
+        "id": "8debdb45d6dcb51a",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "send set cnf",
+        "func": "msg.payload=`\nsx126x setup 125 12 5\\n\nsx126x set freq 436175000\\n\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 80,
+        "wires": [
+            [
+                "f44a01a6b6a5c05f",
+                "67fa1613bbe61cff",
+                "c5582684601dd8f0"
+            ]
+        ]
+    },
+    {
+        "id": "a3c6b68d567ea4a7",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "send set syncword",
+        "func": "msg.payload=`\nsx126x set syncword 52\\n\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 140,
+        "wires": [
+            [
+                "c5582684601dd8f0",
+                "67fa1613bbe61cff",
+                "cceda290b24c6b35"
+            ]
+        ]
+    },
+    {
+        "id": "f44a01a6b6a5c05f",
+        "type": "delay",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "a3c6b68d567ea4a7"
+            ]
+        ]
+    },
+    {
+        "id": "cceda290b24c6b35",
+        "type": "delay",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "9fcb5bd9ae4d149c"
+            ]
+        ]
+    },
+    {
+        "id": "9fcb5bd9ae4d149c",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "send get syncword",
+        "func": "msg.payload=`\nsx126x get syncword\\n\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "c5582684601dd8f0",
+                "67fa1613bbe61cff"
+            ]
+        ]
+    },
+    {
+        "id": "550e102f8f34b1bc",
+        "type": "function",
+        "z": "409deb7dd3d3fb90",
+        "name": "send tele/rx",
+        "func": "\n/*\nstruct ModemInfo {\n  char satellite[25]  = \"Norbi\";\n  String  modem_mode  = \"LoRa\" ;     // 1-LoRa  2-FSK  3-GMSK\n  float   frequency   = 436.703; // MHz  \n  float   freqOffset  = 0;       // Hz \n  float   bw          = 250.0;   // kHz dual sideban\n  uint8_t sf          = 10 ;\n  uint8_t cr          = 5 ;\n  uint8_t sw          = 18;\n  int8_t  power       = 5 ;\n  uint16_t preambleLength = 8;\n  float  \tbitrate     = 9.6 ;\n  float   freqDev     = 5.0;\n  uint8_t    OOK      = false; // 0 disable  1 -> 0.3  2-> 0.5  3 -> 0.6  4-> 1.0\n  bool    crc         = true;\n  uint8_t fldro       = true;\n  uint8_t gain        = 0;\n  uint32_t  NORAD     = 46494;  // funny this remember me WARGames\n  uint8_t   fsw[8]    = {0,0,0,0,0,0,0,0};\n  uint8_t   swSize     = 0;\n  uint8_t   filter[8] = {0,0,0,0,0,0,0,0};\n};\n\n\nvoid MQTT_Client::sendRx(String packet, bool noisy)\n{\n  ConfigManager &configManager = ConfigManager::getInstance();\n  time_t now;\n  time(&now);\n  struct timeval tv;\n  gettimeofday(&tv, NULL);\n\n  const size_t capacity = JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(23) + 25;\n  DynamicJsonDocument doc(capacity);\n  JsonArray station_location = doc.createNestedArray(\"station_location\");\n  station_location.add(configManager.getLatitude());\n  station_location.add(configManager.getLongitude());\n  doc[\"mode\"] = status.modeminfo.modem_mode;\n  doc[\"frequency\"] = status.modeminfo.frequency;\n  doc[\"frequency_offset\"] = status.modeminfo.freqOffset;\n  doc[\"satellite\"] = status.modeminfo.satellite;\n\n  if (String(status.modeminfo.modem_mode) == \"LoRa\")\n  {\n    doc[\"sf\"] = status.modeminfo.sf;\n    doc[\"cr\"] = status.modeminfo.cr;\n    doc[\"bw\"] = status.modeminfo.bw;\n  }\n  else\n  {\n    doc[\"bitrate\"] = status.modeminfo.bitrate;\n    doc[\"freqdev\"] = status.modeminfo.freqDev;\n    doc[\"rxBw\"] = status.modeminfo.bw;\n  }\n\n  doc[\"rssi\"] = status.lastPacketInfo.rssi;\n  doc[\"snr\"] = status.lastPacketInfo.snr;\n  doc[\"frequency_error\"] = status.lastPacketInfo.frequencyerror;\n  doc[\"unix_GS_time\"] = now;\n  doc[\"usec_time\"] = (int64_t)tv.tv_usec + tv.tv_sec * 1000000ll;\n  doc[\"time_offset\"] = status.time_offset;\n  doc[\"crc_error\"] = status.lastPacketInfo.crc_error;\n  doc[\"data\"] = packet.c_str();\n  doc[\"NORAD\"] = status.modeminfo.NORAD;\n  doc[\"test\"] = configManager.getTestMode();\n  doc[\"noisy\"] = noisy;\n\n  char buffer[1536];\n  serializeJson(doc, buffer);\n  Log::debug(PSTR(\"%s\"), buffer);\n  publish(buildTopic(teleTopic, topicRx).c_str(), buffer, false);\n}\n\n*/\n\nconst USERID = '376415063';\nconst STATIONID = 'LIG_01_Heltech868';\n\n  // Topic\nconst globalTopic = \"tinygs/global/%cmnd%\";\nconst cmndTopic = \"tinygs/%user%/%station%/cmnd/%cmnd%\";\nconst teleTopic = \"tinygs/%user%/%station%/tele/%cmnd%\";\nconst statTopic = \"tinygs/%user%/%station%/stat/%cmnd%\";\n\n  // Tele\nconst topicWelcome  = \"welcome\";\nconst topicPing = \"ping\";\nconst topicStatus  = \"status\";\nconst topicRx = \"rx\";\nconst topicGet_adv_prm  = \"get_adv_prm\";\n\nvar topic = \"tinygs/%user%/%station%/tele/%cmnd%\";\ntopic = topic.replace(\"%user%\", USERID)\n            .replace(\"%station%\", STATIONID)\n            .replace(\"%cmnd%\", topicRx);   \n\nmsg.topic = topic;\n\nvar base64Val = \"jv////8KBgHJcCwAAAAA8Q8AAHZSj+VYAEJSSyBNVyBWRVI6MDVhXzAxAAAAAAAOAQD9BwAAAAcZAAjICpKoIQcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACMA9v/H/8T9AAAAAAAAFAQEDw8PDw8PAA8QtwgwIACCNw4MAAwAAAQD/QJvBRMUEgBgEHggtiw=\";\n\nvar doc = {\n    station_location: [45.19041217847022, 5.766792295578571]\n  };\n  doc[\"mode\"] = \"LoRa\";\n  doc[\"frequency\"] = 436.703;\n  doc[\"frequency_offset\"] = 0;\n  doc[\"satellite\"] = \"Norbi\";\n  doc[\"sf\"] = 10;\n  doc[\"cr\"] = 5;\n  doc[\"bw\"] = 250.0;\n  \n  doc[\"rssi\"] = -120.0;\n  doc[\"snr\"] = -5.5;\n  doc[\"frequency_error\"] = 7061.111;\n  \n  var now = Date.now();\n  doc[\"unix_GS_time\"] = now;\n  doc[\"usec_time\"] = (now%1000)*1000 + (now/1000) * 1000000;\n  doc[\"time_offset\"] = 0;\n  doc[\"crc_error\"] = 0;\n  doc[\"data\"] = Buffer.from(base64Val, 'base64').toString('ascii');\n  doc[\"NORAD\"] = 46494;\n  doc[\"test\"] = 1;\n  doc[\"noisy\"] = 0;\n\nmsg.payload = doc;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 880,
+        "wires": [
+            [
+                "187441592f1c5eab"
+            ]
+        ]
+    },
+    {
+        "id": "315f26b3db779233",
+        "type": "inject",
+        "z": "409deb7dd3d3fb90",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 880,
+        "wires": [
+            [
+                "550e102f8f34b1bc"
+            ]
+        ]
+    },
+    {
+        "id": "e3e75d03b5aba76f",
+        "type": "serial in",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "serial": "d62b90c4edbe9e36",
+        "x": 190,
+        "y": 520,
+        "wires": [
+            [
+                "307df0851c0890ec"
+            ]
+        ]
+    },
+    {
+        "id": "3860c974f80a733f",
+        "type": "serial out",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "serial": "d62b90c4edbe9e36",
+        "x": 650,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "0cca3cba63872bbe",
+        "type": "debug",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "9f845c67345bdddf",
+        "type": "inject",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 40,
+        "wires": [
+            [
+                "a11685ff2688f367"
+            ]
+        ]
+    },
+    {
+        "id": "a11685ff2688f367",
+        "type": "function",
+        "z": "5d34e8d22f59825b",
+        "name": "send set cnf",
+        "func": "msg.payload=`\nsx126x setup 125 12 5\\n\nsx126x set freq 436175000\\n\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 40,
+        "wires": [
+            [
+                "0cca3cba63872bbe",
+                "3860c974f80a733f",
+                "0fb7cde5fa9d7bed"
+            ]
+        ]
+    },
+    {
+        "id": "307df0851c0890ec",
+        "type": "debug",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 450,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "b6a48f60f7a9b616",
+        "type": "function",
+        "z": "5d34e8d22f59825b",
+        "name": "send tx",
+        "func": "msg.payload=`sx126x tx 123456789012345\\n`;\n\n// sx126x rx start\\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 300,
+        "wires": [
+            [
+                "3860c974f80a733f"
+            ]
+        ]
+    },
+    {
+        "id": "b4055f35d9f5da49",
+        "type": "inject",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 300,
+        "wires": [
+            [
+                "b6a48f60f7a9b616"
+            ]
+        ]
+    },
+    {
+        "id": "7b9c83af01068267",
+        "type": "function",
+        "z": "5d34e8d22f59825b",
+        "name": "send rx start",
+        "func": "msg.payload=`sx126x rx start\\n`;\n\n// sx126x rx start\\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 360,
+        "wires": [
+            [
+                "3860c974f80a733f",
+                "0cca3cba63872bbe"
+            ]
+        ]
+    },
+    {
+        "id": "3835e707a0343281",
+        "type": "inject",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 360,
+        "wires": [
+            [
+                "7b9c83af01068267"
+            ]
+        ]
+    },
+    {
+        "id": "ebd90a6fb5e766c9",
+        "type": "function",
+        "z": "5d34e8d22f59825b",
+        "name": "send rx stop",
+        "func": "msg.payload=`sx126x rx stop\\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 420,
+        "wires": [
+            [
+                "3860c974f80a733f"
+            ]
+        ]
+    },
+    {
+        "id": "62e7615dee262cd2",
+        "type": "inject",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 420,
+        "wires": [
+            [
+                "ebd90a6fb5e766c9"
+            ]
+        ]
+    },
+    {
+        "id": "99eac04395040789",
+        "type": "function",
+        "z": "5d34e8d22f59825b",
+        "name": "send get cnf",
+        "func": "msg.payload=`\nsx126x get freq\\n\nsx126x get sf\\n\nsx126x get bw\\n\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 140,
+        "wires": [
+            [
+                "3860c974f80a733f",
+                "0cca3cba63872bbe",
+                "dabf0ad5edd41561"
+            ]
+        ]
+    },
+    {
+        "id": "fcb0014152573659",
+        "type": "function",
+        "z": "5d34e8d22f59825b",
+        "name": "send get cnf",
+        "func": "msg.payload=`\nsx126x get syncword\\n\nsx126x get cr\\n\nsx126x get iq\\n\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 180,
+        "wires": [
+            [
+                "3860c974f80a733f",
+                "0cca3cba63872bbe"
+            ]
+        ]
+    },
+    {
+        "id": "dabf0ad5edd41561",
+        "type": "delay",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 160,
+        "y": 180,
+        "wires": [
+            [
+                "fcb0014152573659"
+            ]
+        ]
+    },
+    {
+        "id": "7128a88b56842cdb",
+        "type": "delay",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 160,
+        "y": 140,
+        "wires": [
+            [
+                "99eac04395040789"
+            ]
+        ]
+    },
+    {
+        "id": "957317e6d2fd9e03",
+        "type": "function",
+        "z": "5d34e8d22f59825b",
+        "name": "send set syncword",
+        "func": "msg.payload=`\nsx126x set syncword 52\\n\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 100,
+        "wires": [
+            [
+                "3860c974f80a733f",
+                "7128a88b56842cdb"
+            ]
+        ]
+    },
+    {
+        "id": "0fb7cde5fa9d7bed",
+        "type": "delay",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 160,
+        "y": 100,
+        "wires": [
+            [
+                "957317e6d2fd9e03"
+            ]
+        ]
+    },
+    {
+        "id": "5542c103af771614",
+        "type": "function",
+        "z": "5d34e8d22f59825b",
+        "name": "send get cnf",
+        "func": "msg.payload=`\nsx126x get syncword\\n\nsx126x get cr\\n\nsx126x get iq\\n\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 240,
+        "wires": [
+            [
+                "3860c974f80a733f"
+            ]
+        ]
+    },
+    {
+        "id": "5dd4664db6d405cf",
+        "type": "inject",
+        "z": "5d34e8d22f59825b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 240,
+        "wires": [
+            [
+                "5542c103af771614"
+            ]
+        ]
     }
 ]
