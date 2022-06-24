@@ -1,0 +1,2 @@
+Name,NORAD,Mod,Freq,BW,SF,CR,CRC,IQ,Preamble
+Norby,46494,LoRa,436703000,250,10,5,1,0,8
