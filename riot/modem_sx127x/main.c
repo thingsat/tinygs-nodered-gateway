@@ -41,6 +41,9 @@
 
 #include "fmt.h"
 
+
+#define MAX_FRAME_SIZE 256U
+
 #define SX127X_LORA_MSG_QUEUE   (16U)
 #define SX127X_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
 
@@ -49,8 +52,22 @@
 static char stack[SX127X_STACKSIZE];
 static kernel_pid_t _recv_pid;
 
-static char message[32];
+static char message[MAX_FRAME_SIZE];
+static uint8_t buffer[MAX_FRAME_SIZE];
+
 static sx127x_t sx127x;
+
+void printf_ba(const uint8_t *ba, size_t len, size_t line_size, const char* line_sep) {
+	// TODO replace by fmt.h functions
+	for (unsigned int i = 0; i < len; i++) {
+		if(i!=0 && i % line_size == 0) {
+			printf("%s", line_sep);
+		}
+		printf("%02x ", ba[i]);
+	}
+	printf("%s", line_sep);
+}
+
 
 int lora_setup_cmd(int argc, char **argv)
 {
@@ -233,6 +250,24 @@ int register_cmd(int argc, char **argv)
     return 0;
 }
 
+
+
+static bool hex_mode = 0;
+
+int hex_cmd(int argc, char **argv)
+{
+
+    if (argc < 3 || strcmp(argv[1], "set") != 0) {
+        printf("usage: %s set <1|0>\n", argv[0]);
+        return 1;
+    }
+
+    hex_mode = atoi(argv[2]);
+
+    return 0;
+}
+
+
 int send_cmd(int argc, char **argv)
 {
     if (argc <= 1) {
@@ -240,19 +275,46 @@ int send_cmd(int argc, char **argv)
         return -1;
     }
 
-    printf("sending \"%s\" payload (%u bytes)\n",
-           argv[1], (unsigned)strlen(argv[1]) + 1);
+    if(hex_mode) {
+    	// Convert argv[1] into uint8_t[]
+    	size_t size = fmt_hex_bytes(buffer, argv[1]);
 
-    iolist_t iolist = {
-        .iol_base = argv[1],
-        .iol_len = (strlen(argv[1]) + 1)
-    };
+    	if(size==0) {
+            printf("\"%s\" is not a hexstring\n",
+                   argv[1]);
+            return -1;
+    	} else {
+    		printf("sending \"%s\" payload (%u bytes)\n",
+                   argv[1], size);
 
-    netdev_t *netdev = &sx127x.netdev;
+            iolist_t iolist = {
+                .iol_base = buffer,
+                .iol_len = size
+            };
 
-    if (netdev->driver->send(netdev, &iolist) == -ENOTSUP) {
-        puts("Cannot send: radio is still transmitting");
+            netdev_t *netdev = &sx127x.netdev;
+
+            if (netdev->driver->send(netdev, &iolist) == -ENOTSUP) {
+                puts("Cannot send: radio is still transmitting");
+            }
+    	}
+
+    } else {
+        printf("sending \"%s\" payload (%u bytes)\n",
+               argv[1], (unsigned)strlen(argv[1]) + 1);
+
+        iolist_t iolist = {
+            .iol_base = argv[1],
+            .iol_len = (strlen(argv[1]) + 1)
+        };
+
+        netdev_t *netdev = &sx127x.netdev;
+
+        if (netdev->driver->send(netdev, &iolist) == -ENOTSUP) {
+            puts("Cannot send: radio is still transmitting");
+        }
     }
+
 
     return 0;
 }
@@ -280,6 +342,7 @@ int listen_cmd(int argc, char **argv)
 
     return 0;
 }
+
 
 int syncword_cmd(int argc, char **argv)
 {
@@ -315,6 +378,7 @@ int syncword_cmd(int argc, char **argv)
 
     return 0;
 }
+
 int channel_cmd(int argc, char **argv)
 {
     if (argc < 2) {
@@ -353,7 +417,7 @@ int channel_cmd(int argc, char **argv)
 int rx_timeout_cmd(int argc, char **argv)
 {
     if (argc < 2) {
-        puts("usage: channel <get|set>");
+        puts("usage: rx_timeout <get|set>");
         return -1;
     }
 
@@ -421,6 +485,22 @@ int crc_cmd(int argc, char **argv)
     return 0;
 }
 
+int iq_cmd(int argc, char **argv)
+{
+    netdev_t *netdev = &sx127x.netdev;
+
+    if (argc < 3 || strcmp(argv[1], "set") != 0) {
+        printf("usage: %s set <1|0>\n", argv[0]);
+        return 1;
+    }
+
+    int tmp = atoi(argv[2]);
+
+    _set_opt(netdev, NETOPT_IQ_INVERT, tmp, "IQ check");
+    return 0;
+}
+
+
 int implicit_cmd(int argc, char **argv)
 {
     netdev_t *netdev = &sx127x.netdev;
@@ -452,16 +532,19 @@ int payload_cmd(int argc, char **argv)
     return 0;
 }
 
+
 static const shell_command_t shell_commands[] = {
     { "setup",    "Initialize LoRa modulation settings",     lora_setup_cmd },
     { "implicit", "Enable implicit header",                  implicit_cmd },
     { "crc",      "Enable CRC",                              crc_cmd },
+    { "iq",       "Enable IQ",                               iq_cmd },
     { "payload",  "Set payload length (implicit header)",    payload_cmd },
     { "random",   "Get random number from sx127x",           random_cmd },
     { "syncword", "Get/Set the syncword",                    syncword_cmd },
     { "rx_timeout", "Set the RX timeout",                    rx_timeout_cmd },
     { "channel",  "Get/Set channel frequency (in Hz)",       channel_cmd },
     { "register", "Get/Set value(s) of registers of sx127x", register_cmd },
+    { "hex",      "Set hex mode for send and listen",        hex_cmd },
     { "send",     "Send raw payload string",                 send_cmd },
     { "listen",   "Start raw payload listener",              listen_cmd },
     { "reset",    "Reset the sx127x device",                 reset_cmd },
@@ -491,11 +574,28 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         case NETDEV_EVENT_RX_COMPLETE:
             len = dev->driver->recv(dev, NULL, 0, 0);
             dev->driver->recv(dev, message, len, &packet_info);
-            printf(
-                "{Payload: \"%s\" (%d bytes), RSSI: %i, SNR: %i, TOA: %" PRIu32 "}\n",
-                message, (int)len,
-                packet_info.rssi, (int)packet_info.snr,
-                sx127x_get_time_on_air((const sx127x_t *)dev, len));
+
+            if(hex_mode) {
+
+                printf(
+                    "{Payload: \"");
+
+            	printf_ba((const uint8_t *)message, len, MAX_FRAME_SIZE, "\n");
+
+                printf(
+                    "\" (%d bytes), RSSI: %i, SNR: %i, TOA: %" PRIu32 "}\n",
+                    (int)len,
+                    packet_info.rssi, (int)packet_info.snr,
+                    sx127x_get_time_on_air((const sx127x_t *)dev, len));
+
+            } else {
+                printf(
+                    "{Payload: \"%s\" (%d bytes), RSSI: %i, SNR: %i, TOA: %" PRIu32 "}\n",
+                    message, (int)len,
+                    packet_info.rssi, (int)packet_info.snr,
+                    sx127x_get_time_on_air((const sx127x_t *)dev, len));
+            }
+
             break;
 
         case NETDEV_EVENT_TX_COMPLETE:
@@ -504,9 +604,11 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
             break;
 
         case NETDEV_EVENT_CAD_DONE:
+            puts("CAD done");
             break;
 
         case NETDEV_EVENT_TX_TIMEOUT:
+            puts("Transmission timeout");
             sx127x_set_sleep(&sx127x);
             break;
 

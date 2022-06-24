@@ -1,134 +1,193 @@
-## About
+# LoRa PHY Modem for TinyGS
 
-This is a manual test application for the SX127X radio driver.
-
-This test application uses the default pin configuration provided by the
-driver implementation and that matches the STM32 Nucleo-64 layout.
-It is best to use [SX1272](https://developer.mbed.org/components/SX1272MB2xAS/)
-or [SX1276](https://developer.mbed.org/components/SX1276MB1xAS/) mbed modules
-with nucleo boards or the all-in-one
-[ST P-NUCLEO-LRWAN1 LoRa kit](http://www.st.com/en/evaluation-tools/p-nucleo-lrwan1.html).
-
-If you have other hardware (boards, Semtech based LoRa module), you can adapt
-the configuration to your needs by copying an adapted version of
-`drivers/sx127x/include/sx127x_params.h` file to your application directory.
+This is a LoRa PHY modem based on the RIOT manual test application for the SX127X radio driver.
 
 By default the application builds the SX1276 version of the driver. If you
 want to use this application with a SX1272 module, set the variable `DRIVER` in
 the application [Makefile](Makefile):
 ```
 DRIVER = sx1272
-```
+```	
 instead of
 ```
 DRIVER = sx1276
 ```
+
+## Prerequises
+
+Change into `sys/include/shell.h`
+
+```c
+/**
+ * @brief Default shell buffer size (maximum line length shell can handle)
+ */
+#ifndef SHELL_DEFAULT_BUFSIZE
+#define SHELL_DEFAULT_BUFSIZE   (128)
+#endif
+```
+
 You can also pass `DRIVER` when building the application:
+```bash
+gmake BOARD=nucleo-f411re DRIVER=sx1272 flash term -j 8
+gmake BOARD=nucleo-f401re DRIVER=sx1276 flash term -j 8
 ```
-$ make BOARD=nucleo-l073rz DRIVER=sx1272 -C tests/drivers_sx127x flash term
-```
 
-## Usage
-
-This test application provides low level shell commands to interact with the
-SX1272/SX1276 modules.
-
-Once the board is flashed and you are connected via serial to the shell, use the `help`
-command to display the available commands:
 ```
 > help
-help
 Command              Description
 ---------------------------------------
 setup                Initialize LoRa modulation settings
+implicit             Enable implicit header
+crc                  Enable CRC
+iq                   Enable IQ
+payload              Set payload length (implicit header)
 random               Get random number from sx127x
+syncword             Get/Set the syncword
+rx_timeout           Set the RX timeout
 channel              Get/Set channel frequency (in Hz)
 register             Get/Set value(s) of registers of sx127x
 send                 Send raw payload string
 listen               Start raw payload listener
-reboot               Reboot the node
+reset                Reset the sx127x device
+pm                   interact with layered PM subsystem
 ps                   Prints information about running threads.
+reboot               Reboot the node
+rtc                  control RTC peripheral interface
+version              Prints current RIOT_VERSION
 ```
 
-Once the board is booted, use `setup` to configure the basic LoRa settings:
-* Bandwidth: 125kHz, 250kHz or 500kHz
-* Spreading factor: between 7 and 12
-* Code rate: between 5 and 8
-
-Example:
 ```
-> setup 125 12 5
-setup: setting 125KHz bandwidth
-[Info] setup: configuration set with success
+version
+rtc
+rtc get
 ```
 
-All values are supported by both SX1272 and SX1276.
+## Usage
 
-The `random ` command use the Semtech to generate a random integer value.
+### With Gateway STM32 LRWAN3
 
-Example:
+#### Gateway console
+
+Show eu433 Frequency Plan
+
 ```
-> random
-random: number from sx127x: 2339536315
-> random
-random: number from sx127x: 863363442
+AT+HELP
 ```
-
-The `channel` command allows to change/query the RF frequency channel.
-The default is 868MHz for Europe, change to 915MHz for America. The frequency
-is given/returned in Hz.
-
-Example:
 ```
-> channel set 868000000
-New channel set
-> channel get
-Channel: 868000000
+...
 ```
 
-The `register` command allows to get/set the content of the module registers.
-Example:
 ```
-> register get all
-- listing all registers -
-Reg   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
-0x00 00 80 1A 0B 00 52 D9 00 00 0F 08 2B 00 4D 80 00
-0x10 00 FF 00 00 00 00 00 00 00 00 00 00 00 72 C4 0A
-0x20 00 08 01 FF 00 00 08 00 00 00 00 00 00 50 14 40
-0x30 00 03 05 67 1C 0A 00 0A 42 12 64 19 01 A1 00 00
-0x40 00 10 22 13 0E 5B DB 24 0E 81 3A 2E 00 03 00 00
-0x50 00 00 04 23 01 24 3F B0 09 05 84 0B D0 0B D0 32
-0x60 2B 14 00 00 10 00 00 00 0F E0 00 0C F6 10 1D 07
-0x70 00 5C 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-- done -
+AT+CH
 ```
-
-Use the `send` and `receive` commands in order to exchange messages between several modules.
-You need first to ensure that all modules are configured the same: use `setup` and
-`channel` commands to configure them correctly.
-
-Assuming you have 2 modules, one listening and one sending messages, do the following:
-* On listening module:
 ```
-> setup 125 12 5
-setup: setting 125KHz bandwidth
-[Info] setup: configuration set with success
-> channel set 868000000
-New channel set
-> listen
-Listen mode set
-```
-* On sending module:
-```
-> setup 125 12 5
-setup: setting 125KHz bandwidth
-[Info] setup: configuration set with success
-> channel set 868000000
-New channel set
-> send This\ is\ RIOT!
++CH: 0, 433175000, A, SF7/SF12, BW125KHz (LORA_MULTI_SF)
++CH: 1, 433375000, A, SF7/SF12, BW125KHz (LORA_MULTI_SF)
++CH: 2, 433575000, A, SF7/SF12, BW125KHz (LORA_MULTI_SF)
++CH: 3, 433775000, A, SF7/SF12, BW125KHz (LORA_MULTI_SF)
++CH: 4, 433975000, B, SF7/SF12, BW125KHz (LORA_MULTI_SF)
++CH: 5, 434175000, B, SF7/SF12, BW125KHz (LORA_MULTI_SF)
++CH: 6, 434375000, B, SF7/SF12, BW125KHz (LORA_MULTI_SF)
++CH: 7, 434575000, B, SF7/SF12, BW125KHz (LORA_MULTI_SF)
++CH: 8, OFF                              (LORA_STANDARD)
++CH: 9, OFF                              (FSK)
 ```
 
-On the listening module, the message is captured:
 ```
-{Payload: "This is RIOT!" (13 bytes), RSSI: 103, SNR: 240}
+AT+LORAWAN
 ```
+```
++LORAWAN: PUBLIC
+```
+
+#### Modem console
+
+```
+setup 125 7 5
+channel set 433175000
+syncword set 34
+crc set 1
+send Hello\ World
+hex set 1
+send 000102030480FF0010123456789012345678
+```
+
+```
+setup 125 12 8
+channel set 433375000
+syncword set 34
+crc set 1
+hex set 0
+send Hello\ Thingsat
+hex set 1
+send 000102030480FF0010123456789012345678
+```
+
+Transmitting with IQ inverted (instead of normal)
+```
+crc set 0
+iq set 1
+hex set 1
+send 000102030480FF0010123456789012345678
+```
+
+Listen 
+```
+setup 125 7 5
+channel set 433175000
+syncword set 34
+crc set 1
+hex set 1
+rx_timeout set 10
+listen
+```
+
+
+### With TinyGS ESP32 Heltec 433
+
+echo "jv////8KBgHJcCwAAAAA8Q8AAHZSj+VYAEJSSyBNVyBWRVI6MDVhXzAxAAAAAAAOAQD9BwAAAAcZAAjICpKoIQcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACMA9v/H/8T9AAAAAAAAFAQEDw8PDw8PAA8QtwgwIACCNw4MAAwAAAQD/QJvBRMUEgBgEHggtiw=" | base64 -d | xxd -u -p -c 10000
+
+8EFFFFFFFF0A0601C9702C00000000F10F000076528FE5580042524B204D57205645523A3035615F303100000000000E0100FD0700000007190008C80A92A8210700000000000000000000000000000000000000000000002300F6FFC7FFC4FD0000000000001404040F0F0F0F0F0F000F10B70830200082370E0C000C00000403FD026F051314120060107820B62C
+
+🛰 Norby
+```
+setup 250 10 5
+channel set 436703000
+syncword set 12
+crc set 1
+hex set 1
+send 8EFFFFFFFF0A0601C9702C00000000F10F000076528FE5580042524B204D57205645523A3035615F303100000000000E0100FD0700000007190008C80A92A8210700000000000000000000000000000000000000000000002300F6FFC7FFC4FD0000000000001404040F0F0F0F0F0F000F10B70830200082370E0C000C00000403FD026F051314120060107820B62C
+```
+## Cubesats
+
+```csv
+Name,NORAD,Mod,Freq,BW,SF,CR,CRC,IQ,Preamble
+Norby,46494,LoRa,436703000,250,10,5,1,0,8
+```
+
+|Name|NORAD|Mod|Freq|BW|SF|CR|CRC|IQ|Preamble|
+|-|-|-|-|-|-|-|-|-|-|
+|Norby|46494|LoRa|436703000|250|10|5|1|0|8|
+
+🛰 Norby
+🗺 TLE Location: [64.044,16.282]
+LoRa 436.703Mhz  SF10 CR5  BW: 250kHz
+
+🛰 FEES
+🗺 TLE Location: [72.485,-34.044]
+LoRa 437.2Mhz  SF9 CR5  BW: 125kHz
+
+🛰 FossaSat-2E12
+🗺 TLE Location: [38.099,31.597]
+LoRa 401.7Mhz  SF11 CR8  BW: 125kHz
+
+🛰 FossaSat-2E11
+🗺 TLE Location: [40.423,32.471]
+LoRa 401.7Mhz  SF11 CR8  BW: 125kHz
+
+🛰 SATLLA-2B
+🗺 TLE Location: [31.841,-9.782]
+LoRa 437.25Mhz  SF10 CR5  BW: 62.5kHz
+
+## TODO
+* [ ] add Teseo GNSS shield
