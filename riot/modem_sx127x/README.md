@@ -165,6 +165,8 @@ send 8EFFFFFFFF0A0601C9702C00000000F10F000076528FE5580042524B204D57205645523A303
 ```
 ## TinyGS Cubesats
 
+[CSV File](./cubesats.csv)
+
 |Name|NORAD|Mod|Freq|BW|SF|CR|CRC|IQ|Preamble|
 |-|-|-|-|-|-|-|-|-|-|
 |Norby|46494|LoRa|436703000|250|10|5|1|0|8|
