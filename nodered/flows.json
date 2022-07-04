@@ -1228,7 +1228,6 @@
         "y": 260,
         "wires": [
             [
-                "30c9a739.e4cc48",
                 "f5e138a5.2e1818"
             ]
         ]
@@ -1243,7 +1242,7 @@
         "createDir": true,
         "overwriteFile": "false",
         "encoding": "none",
-        "x": 750,
+        "x": 810,
         "y": 260,
         "wires": [
             []
@@ -1259,7 +1258,7 @@
         "console": false,
         "tostatus": false,
         "complete": "false",
-        "x": 740,
+        "x": 790,
         "y": 340,
         "wires": []
     },
@@ -1274,7 +1273,7 @@
         "overwriteFile": "false",
         "encoding": "none",
         "x": 1050,
-        "y": 380,
+        "y": 400,
         "wires": [
             []
         ]
@@ -1284,7 +1283,7 @@
         "type": "function",
         "z": "2925418ea14790d9",
         "name": "packet_ids_to_get",
-        "func": "var packets = msg.payload.packets;\n\nvar last_packet_id = flow.get('last_packet_id') || 0;\n\nif(packets && packets.length > 0) {\n    flow.set('last_packet_id',packets[0].id);\n    for(var i=0; i<packets.length; i++) {\n        var packet = packets[i];\n        var packet_id = packet.id;\n        if(packet_id === last_packet_id) {\n            break;\n        }\n        node.send({ url: \"https://api.tinygs.com/v1/packet/\" + packet_id });\n    }\n}\n\nreturn undefined;\n",
+        "func": "var packets = msg.payload.packets;\n\nvar last_packet_id = flow.get('last_packet_id') || 0;\n\nif(packets && packets.length > 0) {\n    \n    flow.set('last_packet_id',packets[0].id);\n\n    var i;\n    for(i=0; i<packets.length; i++) {\n        var packet = packets[i];\n        var packet_id = packet.id;\n        if(packet_id === last_packet_id) {\n            break;\n        }\n    }\n    var last_packet_idx = i;\n    \n    \n    for(i=last_packet_idx-1; i>=0; i--) {\n        var packet = packets[i];\n        var packet_id = packet.id;\n        node.send({ url: \"https://api.tinygs.com/v1/packet/\" + packet_id });\n    }\n}\n\nreturn undefined;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
