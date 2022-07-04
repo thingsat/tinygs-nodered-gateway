@@ -28,6 +28,7 @@ Change into `sys/include/shell.h`
 
 You can also pass `DRIVER` when building the application:
 ```bash
+export RIOTBASE=~/github/RIOT-OS/RIOT
 gmake BOARD=nucleo-f411re DRIVER=sx1272 flash term -j 8
 gmake BOARD=nucleo-f401re DRIVER=sx1276 flash term -j 8
 ```
@@ -161,8 +162,21 @@ channel set 436703000
 syncword set 12
 crc set 1
 hex set 1
-send 8EFFFFFFFF0A0601C9702C00000000F10F000076528FE5580042524B204D57205645523A3035615F303100000000000E0100FD0700000007190008C80A92A8210700000000000000000000000000000000000000000000002300F6FFC7FFC4FD0000000000001404040F0F0F0F0F0F000F10B70830200082370E0C000C00000403FD026F051314120060107820B62C
+listen start
 ```
+
+🛰 FossaSAT-2x
+```
+setup 125 11 8
+channel set 401700000
+syncword set 12
+crc set 1
+hex set 1
+listen start
+```
+
+
+
 ## TinyGS Cubesats
 
 [CSV File](./cubesats.csv)
