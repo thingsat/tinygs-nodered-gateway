@@ -1283,7 +1283,7 @@
         "type": "function",
         "z": "2925418ea14790d9",
         "name": "new_packet_ids_to_get",
-        "func": "var packets = msg.payload.packets;\n\nvar last_packet_id = flow.get('last_packet_id') || 0;\n\nif(packets && packets.length > 0) {\n    \n    flow.set('last_packet_id',packets[0].id);\n\n    var i;\n    for(i=0; i<packets.length; i++) {\n        var packet = packets[i];\n        var packet_id = packet.id;\n        if(packet_id === last_packet_id) {\n            break;\n        }\n    }\n    var last_packet_idx = i;\n    \n    \n    for(i=last_packet_idx-1; i>=0; i--) {\n        var packet = packets[i];\n        var packet_id = packet.id;\n        node.send({ url: \"https://api.tinygs.com/v1/packet/\" + packet_id });\n    }\n}\n\nreturn undefined;\n",
+        "func": "var packets = msg.payload.packets;\n\nvar last_packet_id = flow.get('last_packet_id') || 0;\n\nif(packets && packets.length > 0) {\n    \n    flow.set('last_packet_id',packets[0].id);\n\n    var i;\n    var packet;\n    for(i=0; i<packets.length; i++) {\n        packet = packets[i];\n        if(packet.id === last_packet_id) {\n            break;\n        }\n    }\n    var last_packet_idx = i;\n    \n    \n    for(i=last_packet_idx-1; i>=0; i--) {\n        packet = packets[i];\n        node.send({\n            url: \"https://api.tinygs.com/v1/packet/\" + packet.id,\n            topic: \"tinygs/packet/\" + packet.norad + \"/event/rx\"\n        });\n    }\n}\n\nreturn undefined;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
