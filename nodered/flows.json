@@ -1160,8 +1160,7 @@
         "y": 160,
         "wires": [
             [
-                "d906dc6c.37233",
-                "ed7a318c.16b99"
+                "d906dc6c.37233"
             ]
         ]
     },
@@ -1228,7 +1227,8 @@
         "y": 260,
         "wires": [
             [
-                "f5e138a5.2e1818"
+                "f5e138a5.2e1818",
+                "30c9a739.e4cc48"
             ]
         ]
     },
@@ -1282,14 +1282,14 @@
         "id": "3deae7a7.ce4db8",
         "type": "function",
         "z": "2925418ea14790d9",
-        "name": "packet_ids_to_get",
+        "name": "new_packet_ids_to_get",
         "func": "var packets = msg.payload.packets;\n\nvar last_packet_id = flow.get('last_packet_id') || 0;\n\nif(packets && packets.length > 0) {\n    \n    flow.set('last_packet_id',packets[0].id);\n\n    var i;\n    for(i=0; i<packets.length; i++) {\n        var packet = packets[i];\n        var packet_id = packet.id;\n        if(packet_id === last_packet_id) {\n            break;\n        }\n    }\n    var last_packet_idx = i;\n    \n    \n    for(i=last_packet_idx-1; i>=0; i--) {\n        var packet = packets[i];\n        var packet_id = packet.id;\n        node.send({ url: \"https://api.tinygs.com/v1/packet/\" + packet_id });\n    }\n}\n\nreturn undefined;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 250,
+        "x": 270,
         "y": 400,
         "wires": [
             [
@@ -1426,6 +1426,82 @@
         "wires": [
             [
                 "3deae7a7.ce4db8"
+            ]
+        ]
+    },
+    {
+        "id": "413c5f6638f29fc8",
+        "type": "comment",
+        "z": "2925418ea14790d9",
+        "name": "Rate limit is required to avoid banishment by tinygs.org",
+        "info": "Rate limit is required to avoid banishment by tinygs.org",
+        "x": 320,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "7a7aa86509322421",
+        "type": "comment",
+        "z": "2925418ea14790d9",
+        "name": "TODO: last_packet_id should be persistent in a file",
+        "info": "",
+        "x": 310,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "c4171de761c33453",
+        "type": "comment",
+        "z": "2925418ea14790d9",
+        "name": "log of /packets is redundant vith individual packet",
+        "info": "",
+        "x": 910,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "1bdfe5fb81c8251d",
+        "type": "comment",
+        "z": "2925418ea14790d9",
+        "name": "TODO: publish packet to MQTT broker",
+        "info": "",
+        "x": 970,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "471990dd0cf74dd8",
+        "type": "mqtt out",
+        "z": "2925418ea14790d9",
+        "name": "",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "x": 1030,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "4bde7f80fbe31780",
+        "type": "function",
+        "z": "2925418ea14790d9",
+        "name": "add topic",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 660,
+        "wires": [
+            [
+                "471990dd0cf74dd8"
             ]
         ]
     }
